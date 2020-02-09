@@ -3,6 +3,8 @@
 This repository provides demonstrative applications on how to connect with the server
 and send information to clients.
 
+All demos assume you have Channelstream running with default secrets and ports.
+
 You have a simple notification demo built on flask:
 
     cd notification/
