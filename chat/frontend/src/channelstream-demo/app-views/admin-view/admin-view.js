@@ -3,8 +3,8 @@ import {connect} from 'pwa-helpers/connect-mixin.js';
 import {store} from '../../redux/store.js';
 
 import '@material/mwc-linear-progress/mwc-linear-progress.js';
-import '../../../../../../../frontend/src/channelstream-admin/server-info.js';
-import {fetchServerInfo} from '../../../../../../../frontend/src/channelstream-admin/channelstream-admin';
+import './server-info.js';
+import {fetchServerInfo} from './channelstream-admin';
 
 class AdminView extends connect(store)(LitElement) {
 

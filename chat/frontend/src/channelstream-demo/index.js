@@ -1,2 +1,2 @@
-import '../../../../../frontend/src/polyfills';
+import './polyfills';
 import './channelstream-chat-demo/channelstream-chat-demo.js';

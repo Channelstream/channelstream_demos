@@ -46,15 +46,6 @@ module.exports = {
         // remain in ES2015. We’ll talk about this a bit later :)
         new CopyWebpackPlugin([
             {
-                from: path.resolve(__dirname, 'node_modules/web-animations-js'),
-                to: path.join(DEMO_STATIC, 'web-animations-js')
-            },
-            {
-                from: '**/*.js',
-                context: path.resolve(__dirname, 'node_modules/@webcomponents/webcomponentsjs'),
-                to: path.join(DEMO_STATIC, 'webcomponentsjs')
-            },
-            {
                 from: path.resolve(__dirname, 'dist/channelstream-demo.js'),
                 to: path.join(DEMO_STATIC, '[name].[ext]')
             }

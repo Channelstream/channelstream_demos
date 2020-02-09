@@ -3,7 +3,7 @@ import {connect} from 'pwa-helpers/connect-mixin.js';
 import 'weightless/tab-group/tab-group.js';
 import 'weightless/tab/tab.js';
 import '@material/mwc-top-app-bar/mwc-top-app-bar.js';
-import '../../../../../../frontend/src/debug.js';
+import '../debug.js';
 import '@channelstream/channelstream';
 import '../app-views/admin-view/admin-view.js';
 import '../app-views/chat-view/chat-view.js';
@@ -37,7 +37,7 @@ class ChannelStreamChatDemo extends connect(store)(LitElement) {
         </channelstream-connection>
 
         <mwc-top-app-bar type="fixed">
-            <span slot="title" class="title">Channelstream Demo - Hello ${this.user.username}</span>
+            <span slot="title" class="title">Channelstream Demo - Hello ${this.user.username} - Example real-time chat</span>
 
 
             <wl-tab-group slot="actionItems">
