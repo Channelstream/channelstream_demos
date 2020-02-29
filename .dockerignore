@@ -1,0 +1,11 @@
+*
+!chat
+chat/*.egg-info
+!chat/frontend
+chat/frontend/node_modules
+!docker-entrypoint.sh
+!docker-entrypoint-static.sh
+!LICENSE
+!README.md
+!requirements.txt
+**/*.pyc

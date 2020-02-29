@@ -1,0 +1,14 @@
+# Use an official Python runtime as a parent image
+FROM node:13.8.0-buster-slim
+# why do I need python to install nodejs reqs? python 2 at that :/
+RUN apt update; apt install python3 make build-essential -y
+
+ENV PATH $PATH:env/bin
+ENV PYTHON python3
+COPY chat/frontend /opt/frontend
+WORKDIR /opt/frontend
+RUN yarn
+RUN yarn build
+COPY docker-entrypoint-static.sh /opt/docker-entrypoint-static.sh
+ENTRYPOINT ["/opt/docker-entrypoint-static.sh"]
+CMD ["yarn", "dev"]
