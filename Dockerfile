@@ -48,5 +48,11 @@ COPY --from=static /opt/static /opt/application/static
 EXPOSE 6543
 VOLUME /opt/rundir
 ENTRYPOINT ["/opt/docker-entrypoint.sh"]
+ENV CHANNELSTREAM_URL "http://127.0.0.1:8000"
+ENV CHANNELSTREAM_WS_URL "http://127.0.0.1:8000/ws"
+ENV CHANNELSTREAM_SECRET secret
+ENV CHANNELSTREAM_ADMIN_SECRET admin_secret
 # Run application when the container launches
-CMD ["/opt/venv/bin/python", "app.py"]
+CMD /opt/venv/bin/python app.py --channelstream-url=$CHANNELSTREAM_URL \
+--channelstream-ws-url=$CHANNELSTREAM_WS_URL --channelstream-secret=$CHANNELSTREAM_SECRET \
+--channelstream-admin-secret=$CHANNELSTREAM_ADMIN_SECRET
