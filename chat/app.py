@@ -74,7 +74,7 @@ def main():
             url=args.channelstream_url
         )
     )
-    print("The demo is assuming DEFAULT secret variables")
+    print("The demo is assuming DEFAULT secret variables, use --help to see options")
     print("visit demo at http://127.0.0.1:{port}/".format(port=args.demo_port))
     server.serve_forever()
 
