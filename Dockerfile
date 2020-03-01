@@ -21,17 +21,16 @@ WORKDIR /opt/application
 RUN useradd --create-home application
 
 RUN chown -R application /opt/application
-RUN mkdir /opt/rundir
-RUN chown -R application /opt/rundir
 RUN mkdir /opt/venv
 RUN chown -R application /opt/venv
-RUN mkdir /opt/rundir/static
-RUN chown -R application /opt/rundir/static
 # Copy the current directory contents into the container at /opt/application
 COPY chat/requirements.txt /tmp/requirements.txt
 
 # change to non-root user
 USER application
+
+# copy pre-built js
+COPY --from=static /opt/frontend/dist /opt/application/static
 
 RUN python -m venv /opt/venv
 # Install any needed packages specified in requirements.txt
@@ -42,8 +41,6 @@ ENV PATH $PATH:/opt/venv/bin
 COPY docker-entrypoint.sh /opt/docker-entrypoint.sh
 COPY chat /opt/application
 
-# copy pre-built js
-COPY --from=static /opt/static /opt/application/static
 # Make port 6543 available to the world outside this container
 EXPOSE 6543
 VOLUME /opt/rundir
@@ -52,7 +49,8 @@ ENV CHANNELSTREAM_URL "http://127.0.0.1:8000"
 ENV CHANNELSTREAM_WS_URL "http://127.0.0.1:8000/ws"
 ENV CHANNELSTREAM_SECRET secret
 ENV CHANNELSTREAM_ADMIN_SECRET admin_secret
+ENV DEMO_PORT 6543
 # Run application when the container launches
 CMD /opt/venv/bin/python app.py --channelstream-url=$CHANNELSTREAM_URL \
 --channelstream-ws-url=$CHANNELSTREAM_WS_URL --channelstream-secret=$CHANNELSTREAM_SECRET \
---channelstream-admin-secret=$CHANNELSTREAM_ADMIN_SECRET
+--channelstream-admin-secret=$CHANNELSTREAM_ADMIN_SECRET --demo-port=$DEMO_PORT
