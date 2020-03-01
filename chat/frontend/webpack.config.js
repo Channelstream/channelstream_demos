@@ -3,9 +3,11 @@ var CopyWebpackPlugin = require('copy-webpack-plugin');
 var webpackUglifyJsPlugin = require('webpack-uglify-js-plugin');
 var path = require('path');
 
-let DEMO_STATIC = path.resolve(__dirname, '../static/');
-
-console.error(DEMO_STATIC)
+let devDestinationDir = path.resolve(__dirname, '../static/');
+if (!process.env.FRONTEND_ASSSET_ROOT_DIR) {
+    console.log(`env FRONTEND_ASSSET_ROOT_DIR not set, using default asset directory: ${devDestinationDir}`);
+}
+let FRONTEND_ASSSET_ROOT_DIR = process.env.FRONTEND_ASSSET_ROOT_DIR || devDestinationDir;
 
 module.exports = {
     // Tell Webpack which file kicks off our app.
@@ -30,7 +32,7 @@ module.exports = {
     // Remember, *everything* is a module in Webpack. That includes
     // CSS, and (thanks to our loader) HTML.
     module: {
-        rules:[
+        rules: [
             {
                 // If you see a file that ends in .js, just send it to the babel-loader.
                 test: /\.js$/,
@@ -47,7 +49,7 @@ module.exports = {
         new CopyWebpackPlugin([
             {
                 from: path.resolve(__dirname, 'dist/channelstream-demo.js'),
-                to: path.join(DEMO_STATIC, '[name].[ext]')
+                to: path.join(FRONTEND_ASSSET_ROOT_DIR, '[name].[ext]')
             }
         ])
         // new webpackUglifyJsPlugin({
