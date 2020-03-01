@@ -4,7 +4,7 @@ import 'weightless/tab-group/tab-group.js';
 import 'weightless/tab/tab.js';
 import '@material/mwc-top-app-bar/mwc-top-app-bar.js';
 import '../debug.js';
-import '@channelstream/channelstream';
+import {ChannelStreamConnection} from '@channelstream/channelstream';
 import '../app-views/admin-view/admin-view.js';
 import '../app-views/chat-view/chat-view.js';
 import {store} from '../redux/store.js';
@@ -25,17 +25,6 @@ class ChannelStreamChatDemo extends connect(store)(LitElement) {
             currentPage = html`<admin-view></admin-view>`
         }
         return html`
-        <channelstream-connection
-                id="channelstream-connection"
-                .username=${this.user.username}
-                .channels=${this.user.subscribedChannels}
-                @channelstream-listen-message=${(e) => this.receivedMessage(e)}
-                @channelstream-connected=${(e) => this.handleConnected(e)}
-                @channelstream-subscribed=${(e) => this.handleSubscribed(e)}
-                @channelstream-unsubscribed=${(e) => this.handleUnsubscribed(e)}
-                @channelstream-channels-changed=${(e) => this.handleChannelsChange(e)}>
-        </channelstream-connection>
-
         <mwc-top-app-bar type="fixed">
             <span slot="title" class="title">Channelstream Demo - Hello ${this.user.username} - Example real-time chat</span>
 
@@ -63,7 +52,8 @@ class ChannelStreamChatDemo extends connect(store)(LitElement) {
             user: Object,
             channels: Array,
             users: Object,
-            page: String
+            page: String,
+            connection: Object
         };
     }
 
@@ -93,8 +83,8 @@ class ChannelStreamChatDemo extends connect(store)(LitElement) {
         store.dispatch(appActions.setPage(tabName));
     }
 
-    receivedMessage(event) {
-        for (let message of event.detail.messages) {
+    receivedMessage(messages) {
+        for (let message of messages) {
             // add message
             // console.info('message', message);
             if (message.type === 'message' || message.type === 'presence') {
@@ -150,27 +140,33 @@ class ChannelStreamChatDemo extends connect(store)(LitElement) {
 
     /** kicks off the connection */
     firstUpdated() {
-        var channelstreamConnection = this.querySelector('channelstream-connection');
-        channelstreamConnection.connectUrl = this.appConfig.connectUrl;
-        channelstreamConnection.disconnectUrl = this.appConfig.disconnectUrl;
-        channelstreamConnection.subscribeUrl = this.appConfig.subscribeUrl;
-        channelstreamConnection.unsubscribeUrl = this.appConfig.unsubscribeUrl;
-        channelstreamConnection.messageUrl = this.appConfig.messageUrl;
-        channelstreamConnection.messageEditUrl = this.appConfig.messageEditUrl;
-        channelstreamConnection.messageDeleteUrl = this.appConfig.messageDeleteUrl;
-        channelstreamConnection.longPollUrl = this.appConfig.longPollUrl;
-        channelstreamConnection.websocketUrl = this.appConfig.websocketUrl;
-        channelstreamConnection.userStateUrl = this.appConfig.userStateUrl;
-        // enable for tests
-        // channelstreamConnection.noWebsocket = true;
+        this.connection = new ChannelStreamConnection();
+        this.connection.connectUrl = this.appConfig.connectUrl;
+        this.connection.disconnectUrl = this.appConfig.disconnectUrl;
+        this.connection.subscribeUrl = this.appConfig.subscribeUrl;
+        this.connection.unsubscribeUrl = this.appConfig.unsubscribeUrl;
+        this.connection.messageUrl = this.appConfig.messageUrl;
+        this.connection.messageEditUrl = this.appConfig.messageEditUrl;
+        this.connection.messageDeleteUrl = this.appConfig.messageDeleteUrl;
+        this.connection.longPollUrl = this.appConfig.longPollUrl;
+        this.connection.websocketUrl = this.appConfig.websocketUrl;
+        this.connection.userStateUrl = this.appConfig.userStateUrl;
+        this.connection.username = this.user.username;
+        this.connection.channels = this.user.subscribedChannels;
+        this.connection.listenMessageCallback = (data) => this.receivedMessage(data);
+        this.connection.connectCallback = (request, data) => this.handleConnected(data);
+        this.connection.subscribeCallback = (request, data) => this.handleSubscribed(data);
+        this.connection.unsubscribeCallback = (request, data) => this.handleUnsubscribed(data);
+        this.connection.channelsChangedCallback = () => this.handleChannelsChange();
 
+        // enable for tests
+        // this.connection.noWebsocket = true;
         // add a mutator for demo purposes - modify the request
         // to inject some state vars to connection json
-        channelstreamConnection.addMutator('connect', function (request) {
+        this.connection.addMutator('connect', function (request) {
             request.body.state = {email: this.user.email, status: 'ready'};
         }.bind(this));
-        channelstreamConnection.connect();
-
+        this.connection.connect();
         this.addEventListener('channelpicker-subscribe', this.subscribeToChannel);
         this.addEventListener('change-status', this.changeStatus);
         this.addEventListener('message-send', this.messageSend);
@@ -190,8 +186,8 @@ class ChannelStreamChatDemo extends connect(store)(LitElement) {
     }
 
     /** subscribes/unsubscribes users from channels in channelstream */
-    handleChannelsChange(e) {
-        console.log('handleChannelsChange', e.detail);
+    handleChannelsChange() {
+        console.log('handleChannelsChange');
         var connection = this.getConnection();
         var shouldUnsubscribe = connection.calculateUnsubscribe();
         if (shouldUnsubscribe.length > 0) {
@@ -202,11 +198,10 @@ class ChannelStreamChatDemo extends connect(store)(LitElement) {
     }
 
     getConnection() {
-        return this.querySelector('channelstream-connection');
+        return this.connection;
     }
 
-    handleConnected(event) {
-        var data = event.detail.data;
+    handleConnected(data) {
         store.dispatch(userActions.setState(data.state));
         store.dispatch(userActions.setChannels(data.channels));
         store.dispatch(chatViewUsersActions.setUserStates(data.channels_info.users));
@@ -229,9 +224,8 @@ class ChannelStreamChatDemo extends connect(store)(LitElement) {
         }
     }
 
-    handleSubscribed(event) {
+    handleSubscribed(data) {
         console.log('handleSubscribed');
-        var data = event.detail.data;
         var channelInfo = data.channels_info;
         store.dispatch(userActions.setChannels(data.channels));
         store.dispatch(chatViewUsersActions.setUserStates(channelInfo.users));
@@ -241,13 +235,13 @@ class ChannelStreamChatDemo extends connect(store)(LitElement) {
         }
     }
 
-    handleUnsubscribed(event) {
-        var channelKeys = event.detail.data.unsubscribed_from;
+    handleUnsubscribed(data) {
+        var channelKeys = data.unsubscribed_from;
         for (var i = 0; i < channelKeys.length; i++) {
             var key = channelKeys[i];
             store.dispatch(chatViewChannelActions.delChannelState(key));
         }
-        store.dispatch(userActions.setChannels(event.detail.data.channels));
+        store.dispatch(userActions.setChannels(data.channels));
     }
 
     createRenderRoot() {
