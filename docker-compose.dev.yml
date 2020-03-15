@@ -1,0 +1,30 @@
+version: '3.2'
+services:
+  web:
+    stdin_open: true
+    tty: true
+    volumes:
+      - type: bind
+        source: ./chat
+        target: /opt/application
+      - type: bind
+        source: ./chat/static
+        target: /opt/application/static
+  statics:
+    stdin_open: true
+    tty: true
+    build:
+      context: .
+      dockerfile: Dockerfile.static
+    environment:
+      FRONTEND_ASSSET_ROOT_DIR: "/opt/application/static"
+    volumes:
+      - type: bind
+        source: ./chat
+        target: /opt/application
+      - type: bind
+        source: ./chat/static
+        target: /opt/application/static
+volumes:
+  rundir: {}
+  application: {}

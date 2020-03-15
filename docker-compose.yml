@@ -1,0 +1,23 @@
+version: '3.2'
+services:
+  web:
+    build: .
+    ports:
+      - "6543:6543"
+    environment:
+      CHANNELSTREAM_URL: "http://channelstream:8000"
+      DEMO_URL: "http://demo.channelstream.org"
+    networks:
+      - channelstream
+  channelstream:
+    image: channelstream/channelstream:latest
+    ports:
+      - "8000:8000"
+    networks:
+      - channelstream
+    environment:
+      CHANNELSTREAM_ALLOW_POSTING_FROM: "0.0.0.0"
+volumes:
+  logvolume01: {}
+networks:
+  channelstream:
