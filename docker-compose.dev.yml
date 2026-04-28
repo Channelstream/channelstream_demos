@@ -25,6 +25,10 @@ services:
       - type: bind
         source: ./chat/static
         target: /opt/application/static
+      # Mask the bind-mounted (and possibly stale) host node_modules with an
+      # anonymous volume seeded from the image, so the container always uses
+      # the deps installed during `docker compose build` (vite, etc).
+      - /opt/application/frontend/node_modules
 volumes:
   rundir: {}
   application: {}

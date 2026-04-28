@@ -1,6 +1,7 @@
 'use strict';
 
-import {combineReducers} from '../../../../node_modules/redux/dist/redux';
+// Use bare specifier so the bundler resolves redux from node_modules.
+import {combineReducers} from 'redux';
 import channelsReducer from './channels.js';
 import usersReducer from './users.js';
 import messagesReducer from './messages.js';

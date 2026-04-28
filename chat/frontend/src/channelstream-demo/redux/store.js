@@ -1,5 +1,6 @@
-import {createStore, compose, combineReducers, applyMiddleware} from '../../../node_modules/redux/dist/redux';
-import logger from '../../../node_modules/redux-logger/dist/redux-logger';
+// Use bare specifiers so the bundler resolves these from node_modules.
+import {createStore, compose, combineReducers, applyMiddleware} from 'redux';
+import logger from 'redux-logger';
 
 import currentActions from './current_actions';
 import serverInfoView from './server_info';

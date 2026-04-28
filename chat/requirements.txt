@@ -1,5 +1,7 @@
-pyramid==1.10.4
-pyramid-jinja2==2.8
-itsdangerous==1.1.0
-requests==2.22.0
-gevent==21.12.0
+# Lower bounds chosen so Python 3.13 wheels are available.
+# gevent < 24 has no cp313 wheel and would try to compile greenlet from source.
+pyramid>=2.0,<3
+pyramid-jinja2>=2.10
+itsdangerous>=2.0
+requests>=2.32
+gevent>=24.11

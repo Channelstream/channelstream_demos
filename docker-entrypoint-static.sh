@@ -9,7 +9,8 @@ fi
 
 cd /opt/application/frontend
 
+# Install deps the first time the bind-mounted source is started.
 if [ ! -d node_modules ]; then
-     gosu application yarn
+     gosu application npm install
 fi
 gosu application "$@"

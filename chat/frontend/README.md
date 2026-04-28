@@ -1,85 +1,49 @@
-# Polymer App Toolbox - Starter Kit
+# Channelstream chat demo — frontend
 
-[![Build Status](https://travis-ci.org/PolymerElements/polymer-starter-kit.svg?branch=master)](https://travis-ci.org/PolymerElements/polymer-starter-kit)
+LitElement-based web components bundled with [Vite](https://vitejs.dev/).
+The build emits a single self-executing bundle to
+`../static/channelstream-demo.js`, which the Pyramid app serves at
+`/static/channelstream-demo.js` (see `chat/templates/demo.jinja2`).
 
-This template is a starting point for building apps using a drawer-based
-layout. The layout is provided by `app-layout` elements.
+## Layout
 
-This template, along with the `polymer-cli` toolchain, also demonstrates use
-of the "PRPL pattern" This pattern allows fast first delivery and interaction with
-the content at the initial route requested by the user, along with fast subsequent
-navigation by pre-caching the remaining components required by the app and
-progressively loading them on-demand as the user navigates through the app.
+    src/channelstream-demo/
+        index.js                  # entry point
+        polyfills.js
+        channelstream-chat-demo/  # top-level chat component
+        app-views/                # admin + chat views
+        chat-avatar/              # avatar component (gravatar wrapper)
+        redux/                    # store + reducers (app, chat_view, server_info, ...)
 
-The PRPL pattern, in a nutshell:
+## Local development
 
-* **Push** components required for the initial route
-* **Render** initial route ASAP
-* **Pre-cache** components for remaining routes
-* **Lazy-load** and progressively upgrade next routes on-demand
+Requires Node 18+.
 
-### Setup
+    npm install        # only on first run, or after package.json changes
+    npm run dev        # `vite build --watch` — rebuilds chat/static/channelstream-demo.js on every save
 
-##### Prerequisites
+`npm run dev` does **not** start a Vite dev server — the Pyramid app serves
+the bundle off disk. Just refresh the browser to pick up changes.
 
-Install [polymer-cli](https://github.com/Polymer/polymer-cli):
+For a one-off production build:
 
-    npm install -g polymer-cli
+    npm run build
 
-##### Initialize project from template
+The output dir can be overridden with `FRONTEND_ASSSET_ROOT_DIR` (used by
+the Docker build to point at the image's static dir).
 
-    mkdir my-app
-    cd my-app
-    polymer init starter-kit
+## Adding dependencies
 
-### Start the development server
+    npm install <package>
 
-This command serves the app at `http://localhost:8080` and provides basic URL
-routing for the app:
+`package-lock.json` will be created/updated; commit it.
 
-    polymer serve --open
+## Docker development
 
+The repo's `docker-compose.dev.yml` overlay runs this directory in a
+container with `npm run dev`, bind-mounting the host `chat/` so source
+edits trigger rebuilds:
 
-### Build
+    docker compose -f docker-compose.yml -f docker-compose.dev.yml up
 
-This command performs HTML, CSS, and JS minification on the application
-dependencies, and generates a service-worker.js file with code to pre-cache the
-dependencies based on the entrypoint and fragments specified in `polymer.json`.
-The minified files are output to the `build/unbundled` folder, and are suitable
-for serving from a HTTP/2+Push compatible server.
-
-In addition the command also creates a fallback `build/bundled` folder,
-generated using fragment bundling, suitable for serving from non
-H2/push-compatible servers or to clients that do not support H2/Push.
-
-    polymer build
-
-### Preview the build
-
-This command serves the minified version of the app in an unbundled state, as it would
-be served by a push-compatible server:
-
-    polymer serve build/unbundled
-    # Open your browser and navigate to localhost:8080
-
-This command serves the minified version of the app generated using fragment bundling:
-
-    polymer serve build/bundled
-    # Open your browser and navigate to localhost:8080
-
-### Run tests
-
-This command will run
-[Web Component Tester](https://github.com/Polymer/web-component-tester) against the
-browsers currently installed on your machine.
-
-    polymer test
-
-### Adding a new view
-
-You can extend the app by adding more views that will be demand-loaded
-e.g. based on the route, or to progressively render non-critical sections
-of the application.  Each new demand-loaded fragment should be added to the
-list of `fragments` in the included `polymer.json` file.  This will ensure
-those components and their dependencies are added to the list of pre-cached
-components (and will have bundles created in the fallback `bundled` build).
+See the top-level `README.md` for full Docker instructions.

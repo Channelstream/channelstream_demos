@@ -1,4 +1,5 @@
-import {combineReducers} from '../../../../node_modules/redux/dist/redux';
+// Use bare specifier so the bundler resolves redux from node_modules.
+import {combineReducers} from 'redux';
 import channels from './channels'
 import serverStats from './server_stats';
 
